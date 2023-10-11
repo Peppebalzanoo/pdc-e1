@@ -2,6 +2,7 @@
 #include <malloc.h>
 #include <stdbool.h>
 #include <time.h>
+#include <math.h>
 #include "mpi.h"
 
 
@@ -17,18 +18,21 @@ void print_vector(int* vec, int* num);
 
 void sum_vector(int* vec, int* num);
 
-void strategy1(int* curr_id_proc, int* num_proc, int* partial_sum, MPI_Status* mpi_status);
+void strategy1(int* curr_id_proc, int* num_proc, int partial_sum, MPI_Status* mpi_status);
 
-/* ************************************************************************* */
+void strategy2(int* curr_id_proc, int* num_proc, int partial_sum, MPI_Status* mpi_status);
+
+void strategy3(int* curr_id_proc, int* num_proc, int partial_sum, MPI_Status* mpi_status);
+
+/* ****************************************************************************************************************** */
 
 int main(int argc, char** argv) {
-    int curr_id_proc, num_proc;
-    int num_elem, num_loc, num_rest;
-    int count_elem, index;
+    int curr_id_proc, num_proc, num_elem, num_loc, num_rest, count_elem, index;
     int *vec = NULL, *vec_loc = NULL;
-
     int communication_tag = 0;
     MPI_Status mpi_status;
+
+    int strategia = atoi(*(argv+1));
 
     MPI_Init(&argc, &argv);
 
@@ -39,22 +43,20 @@ int main(int argc, char** argv) {
 
     // Process P0 read (num_elem, vec: vector_of_elements) and send information at all process
     if(curr_id_proc == 0){
-        num_elem = atoi(*(argv + 1));
+
+        num_elem = atoi(*(argv + 2)); //In 2 third position of argv[] we find the processes number
 
         //Allocate memory for the input elements
         vec = (int*)malloc((num_elem) * sizeof(int));
 
         if (num_elem <= 20){
             vec = read_input_numbers(vec, &num_elem, argv);
-            print_vector(vec, &num_elem);
-            sum_vector(vec, &num_elem);
         }
         else{
-            //Allocate memory for the input elements
             vec = generate_random_numbers(vec, &num_elem);
-            print_vector(vec, &num_elem);
-            sum_vector(vec, &num_elem);
         }
+        print_vector(vec, &num_elem);
+        sum_vector(vec, &num_elem);
     }
     MPI_Bcast(&num_elem, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
@@ -75,7 +77,7 @@ int main(int argc, char** argv) {
 
         for(int id = 1; id < num_proc; id++){
             index += count_elem;
-            communication_tag = 100 * id;
+            communication_tag = 10 * id;
 
             //Check if  we have reached the P_num_rest process
             //Processes {P_num_rest,...,P_num_proc} receive count - 1 element
@@ -89,23 +91,37 @@ int main(int argc, char** argv) {
         //For each process != P0, {P1,...,P_num_proc}
         vec_loc = (int*)malloc((num_loc) * sizeof(int)); //Allocation  vec_loc
 
-        communication_tag = 100 * curr_id_proc;
+        communication_tag = 10 * curr_id_proc;
         MPI_Recv(vec_loc, num_loc,MPI_INT, 0, communication_tag, MPI_COMM_WORLD, &mpi_status);
     }
 
     //For each process {P0,...,P_num_proc}
-    int curr_sum = calculate_partial_sum(vec_loc, &num_loc);
-    printf("P%d sum_partial[%d]: %d\n", curr_id_proc, num_loc, curr_sum);
-    fflush(stdout);
+    int curr_partial_sum = calculate_partial_sum(vec_loc, &num_loc);
 
-    //Select applicable strategy
-    if(is_power_of_two(&num_proc)){
-        //We can apply 1,2,3;
-        strategy1(&curr_id_proc, &num_proc, &curr_sum, &mpi_status);
-    }
-    else{
-        //We can apply only 1
-        strategy1(&curr_id_proc, &num_proc, &curr_sum, &mpi_status);
+
+    switch (strategia) {
+        case 1:
+            strategy1(&curr_id_proc, &num_proc, curr_partial_sum, &mpi_status);
+            break;
+        case 2:
+            if(is_power_of_two(&num_proc)){
+                strategy2(&curr_id_proc, &num_proc, curr_partial_sum, &mpi_status);
+            }
+            else{
+                strategy1(&curr_id_proc, &num_proc, curr_partial_sum, &mpi_status);
+            }
+            break;
+        case 3:
+            if(is_power_of_two(&num_proc)){
+                strategy3(&curr_id_proc, &num_proc, curr_partial_sum, &mpi_status);
+            }
+            else{
+                strategy1(&curr_id_proc, &num_proc, curr_partial_sum, &mpi_status);
+            }
+            break;
+        default:
+            printf("Strategia non valida!\n");
+            break;
     }
 
     /*******  End MPI Program *******/
@@ -115,10 +131,10 @@ int main(int argc, char** argv) {
     return 0;
 }
 
-/* ************************************************************************* */
+/* ****************************************************************************************************************** */
 int* read_input_numbers(int* punt_vec, int* num, char** punt_argv){
     for(int i = 0; i < (*num); i++) {
-        *(punt_vec + i) = atoi(*(punt_argv + i + 2));
+        *(punt_vec + i) = atoi(*(punt_argv + i + 3)); //In 3 third position of argv[] we find the elements number
     }
     return punt_vec;
 }
@@ -135,7 +151,7 @@ int* generate_random_numbers(int *punt_vec, int* num){
     return punt_vec;
 }
 
-/* ************************************************************************* */
+/* ****************************************************************************************************************** */
 
 bool is_power_of_two(int* num_proc){
     //All power of two numbers have only one bit set
@@ -143,7 +159,7 @@ bool is_power_of_two(int* num_proc){
     return ((*num_proc != 0) && ((*num_proc & (*num_proc - 1)) == 0));
 }
 
-/* ************************************************************************* */
+/* ****************************************************************************************************************** */
 
 void print_vector(int* vec, int* num){
     printf("[");
@@ -164,10 +180,11 @@ void sum_vector(int* vec, int* num){
     for(int i = 0; i < *num; i++){
         sum += *(vec + i);
     }
-    printf("VECTOR SUM: %d\n", sum);
+    printf("@Vector SUM: %d\n", sum);
+    fflush(stdout);
 }
 
-/* ************************************************************************* */
+/* ****************************************************************************************************************** */
 
 int calculate_partial_sum(int* punt_vec, int* num){
     int sum = 0;
@@ -177,24 +194,93 @@ int calculate_partial_sum(int* punt_vec, int* num){
     return sum;
 }
 
-/* ************************************************************************* */
+/* ****************************************************************************************************************** */
 
-void strategy1(int* curr_id_proc, int* num_proc, int* partial_sum, MPI_Status* mpi_status){
+void strategy1(int* curr_id_proc, int* num_proc, int partial_sum, MPI_Status* mpi_status){
+    int tag_send, tag_receive;
+
     if((*curr_id_proc) == 0){
-
         //Start from partial_sum of P0
-        int curr_sum = *partial_sum;
+        int curr_sum = partial_sum;
 
         //P0 receive the partial sum for each P1,...,P_num_proc}
         for(int id = 1; id < (*num_proc); id++){
-            MPI_Recv(partial_sum, 1, MPI_INT, id, (100 * id), MPI_COMM_WORLD, mpi_status);
-            curr_sum += *(partial_sum);
+            tag_receive = 100 * id;
+            MPI_Recv(&partial_sum, 1, MPI_INT, id, (100 * id), MPI_COMM_WORLD, mpi_status);
+            curr_sum += partial_sum;
         }
-        printf("Strategy1 SUM: %d\n", curr_sum);
+        printf("@Strategy1 SUM: %d\n", curr_sum);
         fflush(stdout);
     }
     else{
         //All {P1,...,P_num_proc} processes send partial_sum to P0 process
-        MPI_Send(partial_sum, 1, MPI_INT, 0, (100 * (*curr_id_proc)), MPI_COMM_WORLD);
+        tag_receive = 100 * (*curr_id_proc);
+        MPI_Send(&partial_sum, 1, MPI_INT, 0, tag_receive, MPI_COMM_WORLD);
     }
+}
+
+/* ****************************************************************************************************************** */
+void strategy2(int* curr_id_proc, int* num_proc, int partial_sum, MPI_Status* mpi_status){
+    int rec_sum = 0;
+    int tag_send, tag_receive;
+
+    for(int i = 0; i < log(*num_proc); i++){
+
+        //Check if current process participates in the communication
+        if(((*curr_id_proc) % (int)pow(2,i)) == 0){
+
+            if(((*curr_id_proc) % (int)pow(2,i+1)) == 0){ //Current process is a receiver from curr_id_proc + 2^i
+                tag_receive = 200 * i;
+                MPI_Recv(&rec_sum, 1, MPI_INT, (*curr_id_proc + (int)pow(2, i)), tag_receive, MPI_COMM_WORLD, mpi_status);
+
+                partial_sum += rec_sum;
+
+            }
+            else{ //Current process is a sender to curr_id_proc - 2^i
+                tag_send = 200 * i;
+                MPI_Send(&partial_sum, 1, MPI_INT, (*curr_id_proc - (int)pow(2,i)), tag_send , MPI_COMM_WORLD);
+            }
+        }
+    }
+    if(*curr_id_proc == 0){
+        printf("@Strategy2 SUM: %d\n", partial_sum);
+        fflush(stdout);
+    }
+}
+
+/* ****************************************************************************************************************** */
+
+void strategy3(int* curr_id_proc, int* num_proc, int partial_sum, MPI_Status* mpi_status){
+    int rec_sum = 0;
+    int tag_rec, tag_send;
+
+    //All process participates in the communication
+    for(int i = 0; i < log(*num_proc); i++){
+
+        if(((*curr_id_proc) % (int)pow(2,i+1)) < (int)pow(2,i)){ //Current process is a receiver from curr_id_proc + 2^i
+
+            tag_send = 400 * i;
+            MPI_Send(&partial_sum, 1, MPI_INT, (*curr_id_proc + (int)pow(2,i)), tag_send , MPI_COMM_WORLD);
+
+            tag_rec = 300 * i;
+            MPI_Recv(&rec_sum, 1, MPI_INT, (*curr_id_proc + (int)pow(2, i)), tag_rec, MPI_COMM_WORLD, mpi_status);
+
+
+            partial_sum += rec_sum;
+
+        }
+        else{ //Current process is a sender to curr_id_proc - 2^i
+
+            tag_send = 300 * i;
+            MPI_Send(&partial_sum, 1, MPI_INT, (*curr_id_proc - (int)pow(2,i)), tag_send , MPI_COMM_WORLD);
+
+            tag_rec = 400 * i;
+            MPI_Recv(&rec_sum, 1, MPI_INT, (*curr_id_proc - (int)pow(2, i)), tag_rec, MPI_COMM_WORLD, mpi_status);
+
+            partial_sum += rec_sum;
+        }
+    }
+
+    printf("P%d @Strategy3 SUM: %d\n", *curr_id_proc, partial_sum);
+    fflush(stdout);
 }
