@@ -257,7 +257,7 @@ void strategy3(int* curr_id_proc, int* num_proc, int partial_sum, MPI_Status* mp
     //All process participates in the communication
     for(int i = 0; i < log(*num_proc); i++){
 
-        if(((*curr_id_proc) % (int)pow(2,i+1)) < (int)pow(2,i)){ //Current process is a receiver from curr_id_proc + 2^i
+        if(((*curr_id_proc) % (int)pow(2,i+1)) < (int)pow(2,i)){ //Current process is a sender/receiver from curr_id_proc + 2^i
 
             tag_send = 400 * i;
             MPI_Send(&partial_sum, 1, MPI_INT, (*curr_id_proc + (int)pow(2,i)), tag_send , MPI_COMM_WORLD);
@@ -269,7 +269,7 @@ void strategy3(int* curr_id_proc, int* num_proc, int partial_sum, MPI_Status* mp
             partial_sum += rec_sum;
 
         }
-        else{ //Current process is a sender to curr_id_proc - 2^i
+        else{ //Current process is a a sender/receiver to curr_id_proc - 2^i
 
             tag_send = 300 * i;
             MPI_Send(&partial_sum, 1, MPI_INT, (*curr_id_proc - (int)pow(2,i)), tag_send , MPI_COMM_WORLD);
