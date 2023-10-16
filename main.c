@@ -6,30 +6,32 @@
 #include "mpi.h"
 
 
-int* read_input_numbers(int* punt_vec, int* num, char** punt_argv);
+int* read_input_numbers(int* punt_vec, const int* num, char** punt_argv);
 
-int* generate_random_numbers(int* punt_vec, int* num);
+int* generate_random_numbers(int* punt_vec, const int* num);
 
-bool is_power_of_two(int* num_proc);
+bool is_power_of_two(const int* num_proc);
 
-int calculate_partial_sum(int* punt_vec, int* num);
+int calculate_partial_sum(const int* punt_vec, const int* num);
 
-void print_vector(int* vec, int* num);
+int* calculate_pow(int* punt_pow, const int* num);
 
-void sum_vector(int* vec, int* num);
+void print_vector(const int* vec, const int* num);
 
-void strategy1(int* curr_id_proc, int* num_proc, int partial_sum, MPI_Status* mpi_status);
+void sum_vector(const int* vec, const int* num);
 
-void strategy2(int* curr_id_proc, int* num_proc, double* log_proc, int partial_sum, MPI_Status* mpi_status);
+void strategy1(const int* curr_id_proc, const int* num_proc, int partial_sum,  MPI_Status* mpi_status);
 
-void strategy3(int* curr_id_proc, int* num_proc, double* log_proc, int partial_sum, MPI_Status* mpi_status);
+void strategy2(const int* curr_id_proc, const int* num_proc, const double* log_proc, int partial_sum, int* punt_pow, MPI_Status* mpi_status);
+
+void strategy3(const int* curr_id_proc, const int* num_proc, const double* log_proc, int partial_sum, int* punt_pow, MPI_Status* mpi_status);
 
 /* ****************************************************************************************************************** */
 
 int main(int argc, char** argv) {
-    int curr_id_proc, num_proc, num_elem, num_loc, num_rest, count_elem, index;
+    int curr_id_proc, num_proc, num_input_elem, num_loc, num_rest, count_elem, index;
     double log_proc;
-    int *vec = NULL, *vec_loc = NULL;
+    int *vec = NULL, *vec_loc = NULL, *pow = NULL;
     int communication_tag = 0;
     MPI_Status mpi_status;
 
@@ -41,29 +43,31 @@ int main(int argc, char** argv) {
     MPI_Comm_rank(MPI_COMM_WORLD, &curr_id_proc);
     MPI_Comm_size(MPI_COMM_WORLD, &num_proc);
 
+    //Each process calculate the array of pow
+    pow = (int*)malloc((num_proc) * sizeof(int));
+    calculate_pow(pow, &num_proc);
 
-    // Process P0 read (num_elem, vec: vector_of_elements) and send information at all process
+    // Process P0 read (num_input_elem, vec: vector_of_elements) and send information at all process
     if(curr_id_proc == 0){
-
-        num_elem = atoi(*(argv + 2)); //In 2 third position of argv[] we find the processes number
+        num_input_elem = atoi(*(argv + 2)); //In third position of argv[] we find the number of elements
 
         //Allocate memory for the input elements
-        vec = (int*)malloc((num_elem) * sizeof(int));
+        vec = (int*)malloc((num_input_elem) * sizeof(int));
 
-        if (num_elem <= 20){
-            vec = read_input_numbers(vec, &num_elem, argv);
+        if (num_input_elem <= 20){
+            vec = read_input_numbers(vec, &num_input_elem, argv);
         }
         else{
-            vec = generate_random_numbers(vec, &num_elem);
+            vec = generate_random_numbers(vec, &num_input_elem);
         }
-        print_vector(vec, &num_elem);
-        sum_vector(vec, &num_elem);
+        print_vector(vec, &num_input_elem);
+        sum_vector(vec, &num_input_elem);
     }
-    MPI_Bcast(&num_elem, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&num_input_elem, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
     //All processes calculate num_loc and num_rest
-    num_loc = (num_elem / num_proc);  // Number of elements for current process
-    num_rest = (num_elem % num_proc); // Number of elements to assign at {P0,...,(P_num_rest - 1)} processes
+    num_loc = (num_input_elem / num_proc);  // Number of elements for current process
+    num_rest = (num_input_elem % num_proc); // Number of elements to assign at {P0,...,(P_num_rest - 1)} processes
 
     log_proc = log2(num_proc);
 
@@ -110,7 +114,7 @@ int main(int argc, char** argv) {
             break;
         case 2:
             if(is_power_of_two(&num_proc)){
-                strategy2(&curr_id_proc, &num_proc, &log_proc, curr_partial_sum, &mpi_status);
+                strategy2(&curr_id_proc, &num_proc, &log_proc, curr_partial_sum, pow, &mpi_status);
             }
             else{
                 strategy1(&curr_id_proc, &num_proc, curr_partial_sum, &mpi_status);
@@ -118,10 +122,10 @@ int main(int argc, char** argv) {
             break;
         case 3:
             if(is_power_of_two(&num_proc)){
-                strategy3(&curr_id_proc, &num_proc, &log_proc, curr_partial_sum, &mpi_status);
+                strategy3(&curr_id_proc, &num_proc, &log_proc, curr_partial_sum, pow, &mpi_status);
             }
             else{
-                strategy1(&curr_id_proc, &num_proc, curr_partial_sum, &mpi_status);
+                strategy1(&curr_id_proc, &num_proc, curr_partial_sum,  &mpi_status);
             }
             break;
         default:
@@ -137,14 +141,14 @@ int main(int argc, char** argv) {
 }
 
 /* ****************************************************************************************************************** */
-int* read_input_numbers(int* punt_vec, int* num, char** punt_argv){
+int* read_input_numbers(int* const punt_vec, const int* num, char** const punt_argv){
     for(int i = 0; i < (*num); i++) {
         *(punt_vec + i) = atoi(*(punt_argv + i + 3)); //In 3 third position of argv[] we find the elements number
     }
     return punt_vec;
 }
 
-int* generate_random_numbers(int *punt_vec, int* num){
+int* generate_random_numbers(int *punt_vec, const int* num){
     int const max = 1000;
     int const min = 1;
 
@@ -158,7 +162,7 @@ int* generate_random_numbers(int *punt_vec, int* num){
 
 /* ****************************************************************************************************************** */
 
-bool is_power_of_two(int* num_proc){
+bool is_power_of_two(const int* num_proc){
     //All power of two numbers have only one bit set
     //If num is a power of 2 then bitwise & of num and num-1 will be zero
     return ((*num_proc != 0) && ((*num_proc & (*num_proc - 1)) == 0));
@@ -166,11 +170,11 @@ bool is_power_of_two(int* num_proc){
 
 /* ****************************************************************************************************************** */
 
-void print_vector(int* vec, int* num){
+void print_vector(const int* vec, const int* num){
     printf("[");
     for(int i = 0; i < *num; i++){
         if(i == (*num)-1){
-            printf("%d]\n");
+            printf("%d]\n", *(vec+i));
             fflush(stdout);
         }
         else{
@@ -180,7 +184,7 @@ void print_vector(int* vec, int* num){
     }
 }
 
-void sum_vector(int* vec, int* num){
+void sum_vector(const int* vec, const int* num){
     int sum = 0;
     for(int i = 0; i < *num; i++){
         sum += *(vec + i);
@@ -191,7 +195,7 @@ void sum_vector(int* vec, int* num){
 
 /* ****************************************************************************************************************** */
 
-int calculate_partial_sum(int* punt_vec, int* num){
+int calculate_partial_sum(const int* punt_vec, const int* num){
     int sum = 0;
     for(int i = 0; i < *num; i++){
         sum += *(punt_vec + i);
@@ -199,9 +203,18 @@ int calculate_partial_sum(int* punt_vec, int* num){
     return sum;
 }
 
+int* calculate_pow(int* punt_pow, const int* num){
+    *(punt_pow) = 1;
+    int pow = 2;
+    for(int i = 1; i < *num; i++){
+        *(punt_pow + i) = pow;
+        pow *= 2;
+    }
+    return punt_pow;
+}
 /* ****************************************************************************************************************** */
 
-void strategy1(int* curr_id_proc, int* num_proc, int partial_sum, MPI_Status* mpi_status){
+void strategy1(const int* curr_id_proc, const int* num_proc, int partial_sum, MPI_Status* mpi_status){
     int tag_receive;
 
     if((*curr_id_proc) == 0){
@@ -227,25 +240,25 @@ void strategy1(int* curr_id_proc, int* num_proc, int partial_sum, MPI_Status* mp
 }
 
 /* ****************************************************************************************************************** */
-void strategy2(int* curr_id_proc, int* num_proc, double* log_proc, int partial_sum, MPI_Status* mpi_status){
+void strategy2(const int* curr_id_proc, const int* num_proc, const double* log_proc, int partial_sum, int* punt_pow, MPI_Status* mpi_status){
     int rec_sum = 0;
     int tag_send, tag_receive;
 
     for(int i = 0; i < (*log_proc); i++){
 
         //Check if current process participates in the communication
-        if(((*curr_id_proc) % (int)pow(2,i)) == 0){
+        if((*curr_id_proc % *(punt_pow+i)) == 0){
 
-            if(((*curr_id_proc) % (int)pow(2,i+1)) == 0){ //Current process is a receiver from curr_id_proc + 2^i
+            if((*curr_id_proc % *(punt_pow+i+1)) == 0){ //Current process is a receiver from curr_id_proc + 2^i
                 tag_receive = 200 * i;
-                MPI_Recv(&rec_sum, 1, MPI_INT, (*curr_id_proc + (int)pow(2, i)), tag_receive, MPI_COMM_WORLD, mpi_status);
+                MPI_Recv(&rec_sum, 1, MPI_INT, (*curr_id_proc + *(punt_pow+i)), tag_receive, MPI_COMM_WORLD, mpi_status);
 
                 partial_sum += rec_sum;
 
             }
             else{ //Current process is a sender to curr_id_proc - 2^i
                 tag_send = 200 * i;
-                MPI_Send(&partial_sum, 1, MPI_INT, (*curr_id_proc - (int)pow(2,i)), tag_send , MPI_COMM_WORLD);
+                MPI_Send(&partial_sum, 1, MPI_INT, (*curr_id_proc - *(punt_pow+i)), tag_send , MPI_COMM_WORLD);
             }
         }
     }
@@ -257,32 +270,29 @@ void strategy2(int* curr_id_proc, int* num_proc, double* log_proc, int partial_s
 
 /* ****************************************************************************************************************** */
 
-void strategy3(int* curr_id_proc, int* num_proc, double* log_proc, int partial_sum, MPI_Status* mpi_status){
+void strategy3(const int* curr_id_proc, const int* num_proc, const double* log_proc, int partial_sum, int* punt_pow, MPI_Status* mpi_status){
     int rec_sum = 0;
     int tag_rec, tag_send;
 
     //All process participates in the communication
     for(int i = 0; i < (*log_proc); i++){
-
-        if(((*curr_id_proc) % (int)pow(2,i+1)) < (int)pow(2,i)){ //Current process is a sender/receiver from curr_id_proc + 2^i
-
+        if( (*curr_id_proc % *(punt_pow + i + 1) ) < *(punt_pow + i) ){ //Current process is a sender/receiver from curr_id_proc + 2^i
             tag_send = 400 * i;
-            MPI_Send(&partial_sum, 1, MPI_INT, (*curr_id_proc + (int)pow(2,i)), tag_send , MPI_COMM_WORLD);
+            MPI_Send(&partial_sum, 1, MPI_INT, (*curr_id_proc + *(punt_pow + i)), tag_send , MPI_COMM_WORLD);
+
 
             tag_rec = 300 * i;
-            MPI_Recv(&rec_sum, 1, MPI_INT, (*curr_id_proc + (int)pow(2, i)), tag_rec, MPI_COMM_WORLD, mpi_status);
-
+            MPI_Recv(&rec_sum, 1, MPI_INT, (*curr_id_proc + *(punt_pow + i)), tag_rec, MPI_COMM_WORLD, mpi_status);
 
             partial_sum += rec_sum;
 
         }
         else{ //Current process is a sender/receiver to curr_id_proc - 2^i
-
             tag_send = 300 * i;
-            MPI_Send(&partial_sum, 1, MPI_INT, (*curr_id_proc - (int)pow(2,i)), tag_send , MPI_COMM_WORLD);
+            MPI_Send(&partial_sum, 1, MPI_INT, (*curr_id_proc - *(punt_pow + i)), tag_send , MPI_COMM_WORLD);
 
             tag_rec = 400 * i;
-            MPI_Recv(&rec_sum, 1, MPI_INT, (*curr_id_proc - (int)pow(2, i)), tag_rec, MPI_COMM_WORLD, mpi_status);
+            MPI_Recv(&rec_sum, 1, MPI_INT, (*curr_id_proc - *(punt_pow + i)), tag_rec, MPI_COMM_WORLD, mpi_status);
 
             partial_sum += rec_sum;
         }
