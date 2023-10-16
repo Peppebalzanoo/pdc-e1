@@ -22,9 +22,9 @@ void sum_vector(const int* vec, const int* num);
 
 void strategy1(const int* curr_id_proc, const int* num_proc, int partial_sum,  MPI_Status* mpi_status);
 
-void strategy2(const int* curr_id_proc, const int* num_proc, const double* log_proc, int partial_sum, int* punt_pow, MPI_Status* mpi_status);
+void strategy2(const int* curr_id_proc, const double* log_proc, int partial_sum, const int* punt_pow, MPI_Status* mpi_status);
 
-void strategy3(const int* curr_id_proc, const int* num_proc, const double* log_proc, int partial_sum, int* punt_pow, MPI_Status* mpi_status);
+void strategy3(const int* curr_id_proc, const double* log_proc, int partial_sum, const int* punt_pow, MPI_Status* mpi_status);
 
 /* ****************************************************************************************************************** */
 
@@ -114,7 +114,7 @@ int main(int argc, char** argv) {
             break;
         case 2:
             if(is_power_of_two(&num_proc)){
-                strategy2(&curr_id_proc, &num_proc, &log_proc, curr_partial_sum, pow, &mpi_status);
+                strategy2(&curr_id_proc, &log_proc, curr_partial_sum, pow, &mpi_status);
             }
             else{
                 strategy1(&curr_id_proc, &num_proc, curr_partial_sum, &mpi_status);
@@ -122,7 +122,7 @@ int main(int argc, char** argv) {
             break;
         case 3:
             if(is_power_of_two(&num_proc)){
-                strategy3(&curr_id_proc, &num_proc, &log_proc, curr_partial_sum, pow, &mpi_status);
+                strategy3(&curr_id_proc, &log_proc, curr_partial_sum, pow, &mpi_status);
             }
             else{
                 strategy1(&curr_id_proc, &num_proc, curr_partial_sum,  &mpi_status);
@@ -240,7 +240,7 @@ void strategy1(const int* curr_id_proc, const int* num_proc, int partial_sum, MP
 }
 
 /* ****************************************************************************************************************** */
-void strategy2(const int* curr_id_proc, const int* num_proc, const double* log_proc, int partial_sum, int* punt_pow, MPI_Status* mpi_status){
+void strategy2(const int* curr_id_proc, const double* log_proc, int partial_sum, const int* punt_pow, MPI_Status* mpi_status){
     int rec_sum = 0;
     int tag_send, tag_receive;
 
@@ -270,7 +270,7 @@ void strategy2(const int* curr_id_proc, const int* num_proc, const double* log_p
 
 /* ****************************************************************************************************************** */
 
-void strategy3(const int* curr_id_proc, const int* num_proc, const double* log_proc, int partial_sum, int* punt_pow, MPI_Status* mpi_status){
+void strategy3(const int* curr_id_proc, const double* log_proc, int partial_sum, const int* punt_pow, MPI_Status* mpi_status){
     int rec_sum = 0;
     int tag_rec, tag_send;
 
