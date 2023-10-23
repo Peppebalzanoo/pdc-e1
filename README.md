@@ -59,6 +59,8 @@ In order to understand how the problem size, the number of processors used, and 
 
 For each of the three strategies, the number of values to be summed is 10.000, 100.000, 1.000.000, and 10.000.000, while the number of processors used for the various analyses is 1, 2, 4, and 8. This is because only with a number of processors that is a power of two can all three strategies be applied.
 
+In most cases, a significant improvement was observed when parallelizing the summation calculations. The only situations where using multiple processors did not prove to be efficient were for very small problem sizes. This inefficiency is due to the relatively higher communication costs incurred when using multiple processors.
+
 ## Strategy 1
 <p align="center">
   <img src="https://github.com/Peppebalzanoo/pdc-e1/assets/59487799/d5a19528-be66-4e6a-bcbc-a3cf48fc8ba0" align="center" height="300" width="650"/>
