@@ -63,27 +63,20 @@ In most cases, a significant improvement was observed when parallelizing the sum
 
 ## Strategy 1
 <p align="center">
-  <img src="https://github.com/Peppebalzanoo/pdc-e1/assets/59487799/d5a19528-be66-4e6a-bcbc-a3cf48fc8ba0" align="center" height="300" width="650"/>
 </p>
 <br>
 <p align="center">
-  <img src="https://github.com/Peppebalzanoo/pdc-e1/assets/59487799/4584c41f-cf29-4d6d-aacf-2a919ed30ae2" align="center" height="280" width="450"/>
 </p>
 
 ## Strategy 2
 <p align="center">
-  <img src="https://github.com/Peppebalzanoo/pdc-e1/assets/59487799/6a02700d-1549-4fb4-bb26-61a1afa47489" align="center" height="300" width="650"/>
 </p>
 <br>
 <p align="center">
-  <img src="https://github.com/Peppebalzanoo/pdc-e1/assets/59487799/3c700885-0914-4ec7-ab77-1e1030371f55" align="center" height="280" width="450"/>
 </p>
 
 ## Strategy 3
 <p align="center">
-  <img src="https://github.com/Peppebalzanoo/pdc-e1/assets/59487799/fb029352-c507-47a7-a887-09a15b34a295" align="center" height="300" width="650"/>
-</p>
 <br>
 <p align="center">
-  <img src="https://github.com/Peppebalzanoo/pdc-e1/assets/59487799/6c6f8319-c885-46a6-a7dd-307f794e0d71" align="center" height="280" width="450"/>
 </p>
