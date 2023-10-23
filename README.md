@@ -22,11 +22,21 @@ $n$ = 16 and $p$ = 4, we should:
   8.  Solving the $p = 1$ sub-problem will return the sum of ($s_0 + s_1 + s_2 + s_3$), which is the total sum
 
 <p align="center">
-<img src="https://github.com/Peppebalzanoo/pdc-e1/assets/59487799/c580ac51-26f2-4238-a737-df1614297334" align="center" height="200" width="350"/>
+  <img src="https://github.com/Peppebalzanoo/pdc-e1/assets/59487799/c580ac51-26f2-4238-a737-df1614297334" align="center" height="200" width="350"/>
 </p>
 <br>
 
-## For solving the problem, three strategies have been implemented.
+## Data Reading and Generation
+In the implementation, data is expected to be either read from input sources (if $n <= 20$) or generated (if $n > 20$) using a pseudo-random number generator. It's important to note that data generation does not reflect reality because, in real parallel computing environments, data is not generated but is already available for reading and utilization.
+
+## Data Distribution Among Processors
+This phase involves the fair and balanced distribution of data across various processors, labeled as $P_1, P_2, ..., P_n$. There are different techniques for achieving load balance, and the one used in this work is data partitioning, which allows for dividing the dataset in a way that each processor receives a similar amount of data for processing. This is particularly useful when the workload is known in advance, and the data can be divided fairly. An equitable and balanced load distribution will ensure:
+  1. Optimal performance
+  2. Increased efficiency in resource utilization
+  3. Reduction in waiting times
+  4. Scalability
+  5. Enhanced reliability
+
 ## Strategy 1
 Once each processor $P_i$ has computed the partial sums $S_i$, each partial sum will be sent to a specific process (in our case, $P_0$) that will sequentially sum these partial sums to obtain the total sum. In this case, the total sum is stored on a single processor, $P_0$.
 ## Strategy 2
