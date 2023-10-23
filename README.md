@@ -53,3 +53,35 @@ This process is iteratively repeated until the total sum is contained in a singl
 
 ## Strategy 3
 The third strategy is very similar to the second one, but at each communication step, all processors are involved. This means that every processor in each pair both sends and receives partial sums. The purpose of this approach is to ensure that, at the end of the algorithm, the total sum is distributed across all processors. However, this strategy can be computationally expensive due to a high number of communications.
+
+## Performance Analysis
+In order to understand how the problem size, the number of processors used, and the chosen strategy influence the output times as they vary, tables and graphs will be presented below for Execution Time, Speed-Up, and Efficiency.
+
+For each of the three strategies, the number of values to be summed is 10.000, 100.000, 1.000.000, and 10.000.000, while the number of processors used for the various analyses is 1, 2, 4, and 8. This is because only with a number of processors that is a power of two can all three strategies be applied.
+
+## Strategy 1
+<p align="center">
+  <img src="https://github.com/Peppebalzanoo/pdc-e1/assets/59487799/d5a19528-be66-4e6a-bcbc-a3cf48fc8ba0" align="center" height="300" width="650"/>
+</p>
+<br>
+<p align="center">
+  <img src="https://github.com/Peppebalzanoo/pdc-e1/assets/59487799/4584c41f-cf29-4d6d-aacf-2a919ed30ae2" align="center" height="280" width="450"/>
+</p>
+
+## Strategy 2
+<p align="center">
+  <img src="https://github.com/Peppebalzanoo/pdc-e1/assets/59487799/6a02700d-1549-4fb4-bb26-61a1afa47489" align="center" height="300" width="650"/>
+</p>
+<br>
+<p align="center">
+  <img src="https://github.com/Peppebalzanoo/pdc-e1/assets/59487799/3c700885-0914-4ec7-ab77-1e1030371f55" align="center" height="280" width="450"/>
+</p>
+
+## Strategy 3
+<p align="center">
+  <img src="https://github.com/Peppebalzanoo/pdc-e1/assets/59487799/fb029352-c507-47a7-a887-09a15b34a295" align="center" height="300" width="650"/>
+</p>
+<br>
+<p align="center">
+  <img src="https://github.com/Peppebalzanoo/pdc-e1/assets/59487799/6c6f8319-c885-46a6-a7dd-307f794e0d71" align="center" height="280" width="450"/>
+</p>
