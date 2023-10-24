@@ -22,7 +22,7 @@ $n$ = 16 and $p$ = 4, we should:
   8.  Solving the $p = 1$ sub-problem will return the sum of ($s_0 + s_1 + s_2 + s_3$), which is the total sum
 
 <p align="center">
-  <img src="https://github.com/Peppebalzanoo/pdc-e1/assets/59487799/c580ac51-26f2-4238-a737-df1614297334" align="center" height="200" width="350"/>
+  <img src="https://github.com/Peppebalzanoo/pdc-e1/assets/59487799/c580ac51-26f2-4238-a737-df1614297334" align="center" width="35%" height="35%"/>
 </p>
 <br>
 
@@ -55,7 +55,7 @@ This process is iteratively repeated until the total sum is contained in a singl
 The third strategy is very similar to the second one, but at each communication step, all processors are involved. This means that every processor in each pair both sends and receives partial sums. The purpose of this approach is to ensure that, at the end of the algorithm, the total sum is distributed across all processors. However, this strategy can be computationally expensive due to a high number of communications.
 
 ## Performance Analysis
-In order to understand how the problem size, the number of processors used, and the chosen strategy influence the output times as they vary, tables and graphs will be presented below for Execution Time, Speed-Up, and Efficiency.
+In order to understand how the problem size, the number of processors used, and the chosen strategy influence the output times as they vary, tables and graphs will be presented below for Speed-Up and Efficiency.
 
 For each of the three strategies, the number of values to be summed is 10.000, 100.000, 1.000.000, and 10.000.000, while the number of processors used for the various analyses is 1, 2, 4, and 8. This is because only with a number of processors that is a power of two can all three strategies be applied.
 
@@ -63,20 +63,29 @@ In most cases, a significant improvement was observed when parallelizing the sum
 
 ## Strategy 1
 <p align="center">
+  <img src= "https://github.com/Peppebalzanoo/pdc-e1/assets/59487799/ac2919a8-8f36-4d39-a4aa-ebcbe9a773e5" width="70%" height="70%"/>
 </p>
 <br>
 <p align="center">
+  <img src="https://github.com/Peppebalzanoo/pdc-e1/assets/59487799/1d38f9d3-0a25-4931-82b9-6ddf993d733d" width="70%" height="70%"/>
 </p>
 
 ## Strategy 2
 <p align="center">
+   <img src="https://github.com/Peppebalzanoo/pdc-e1/assets/59487799/6f76683c-f586-4eda-be76-cd600f893374" width="70%" height="70%"/>
 </p>
 <br>
 <p align="center">
+   <img src="https://github.com/Peppebalzanoo/pdc-e1/assets/59487799/6e078490-227f-4d95-9ff6-4380155f7bfa" width="70%" height="70%"/>
 </p>
+
 
 ## Strategy 3
 <p align="center">
+   <img src="https://github.com/Peppebalzanoo/pdc-e1/assets/59487799/e11ac00c-8434-4ae0-83b4-638666145c80" width="70%" height="70%"/>
+</p>
 <br>
 <p align="center">
+   <img src="https://github.com/Peppebalzanoo/pdc-e1/assets/59487799/b7929394-de09-475f-ab44-8a680600ba7c" width="70%" height="70%"/>
 </p>
+
