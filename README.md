@@ -22,8 +22,10 @@ $n$ = 16 and $p$ = 4, we should:
   8.  Solving the $p = 1$ sub-problem will return the sum of ($s_0 + s_1 + s_2 + s_3$), which is the total sum
 
 <p align="center">
-  <img src="" align="center" width="35%" height="35%"/>
+  <img src="https://github.com/Peppebalzanoo/pdc-e1/assets/59487799/1c0df259-bb9b-4cd8-a09e-d69cbafef13e" align="center" width="35%" height="35%"/>
 </p>
+
+
 <br>
 
 ## Data Reading and Generation
@@ -63,29 +65,28 @@ In most cases, a significant improvement was observed when parallelizing the sum
 
 ## Strategy 1
 <p align="center">
-  <img src= "" width="70%" height="70%"/>
+  <img src= "https://github.com/Peppebalzanoo/pdc-e1/assets/59487799/3c872129-81da-4d2e-a6ba-66b7bcc1dc9e" width="70%" height="70%"/>
 </p>
 <br>
 <p align="center">
-  <img src="" width="70%" height="70%"/>
+  <img src="https://github.com/Peppebalzanoo/pdc-e1/assets/59487799/6092098e-58e9-42e2-8432-7be61be4c805" width="70%" height="70%"/>
 </p>
 
 ## Strategy 2
 <p align="center">
-   <img src="" width="70%" height="70%"/>
+   <img src="https://github.com/Peppebalzanoo/pdc-e1/assets/59487799/baa44d78-c350-4d90-b17b-b2064053d535" width="70%" height="70%"/>
 </p>
 <br>
 <p align="center">
-   <img src="" width="70%" height="70%"/>
+   <img src="https://github.com/Peppebalzanoo/pdc-e1/assets/59487799/e769c62e-08be-4d94-97f0-59c196cd50a5" width="70%" height="70%"/>
 </p>
-
 
 ## Strategy 3
 <p align="center">
-   <img src="" width="70%" height="70%"/>
+   <img src="https://github.com/Peppebalzanoo/pdc-e1/assets/59487799/53e64c80-8072-40b3-a785-28a5c82e38e1" width="70%" height="70%"/>
 </p>
 <br>
 <p align="center">
-   <img src="" width="70%" height="70%"/>
+   <img src="https://github.com/Peppebalzanoo/pdc-e1/assets/59487799/0527a673-5da5-4c93-8a3f-20a409baaf82" width="70%" height="70%"/>
 </p>
 
