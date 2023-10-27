@@ -353,4 +353,3 @@ void strategy3(const int* curr_id_proc, const double* log_proc, double* partial_
         fflush(stdout);
     }
 }
-
