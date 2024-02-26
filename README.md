@@ -40,4 +40,5 @@ This process is iteratively repeated until the total sum is contained in a singl
 ## Strategy 3
 The third strategy is very similar to the second one, but at each communication step, all processors are involved. This means that every processor in each pair both sends and receives partial sums. The purpose of this approach is to ensure that, at the end of the algorithm, the total sum is distributed across all processors. However, this strategy can be computationally expensive due to a high number of communications.
 
+MPI: https://en.wikipedia.org/wiki/Message_Passing_Interface
 
